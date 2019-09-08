@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -62,10 +62,16 @@ namespace HorseWhistle
             }
 
             // add all event listener methods
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            Helper.Events.Input.ButtonPressed += OnButtonPressed;
             if (!_config.EnableGrid) return;
-            GameEvents.SecondUpdateTick += (sender, e) => UpdateGrid();
-            GraphicsEvents.OnPostRenderEvent += (sender, e) => DrawGrid(Game1.spriteBatch);
+            Helper.Events.GameLoop.UpdateTicked += (sender, e) => 
+            {
+                if (e.IsMultipleOf(2))
+                {
+                    UpdateGrid();
+                }
+            };
+            Helper.Events.Display.Rendered += (sender, e) => DrawGrid(Game1.spriteBatch);
         }
 
 
@@ -75,7 +81,7 @@ namespace HorseWhistle
         /// <summary>The method invoked when the player presses a keyboard button.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsPlayerFree)
                 return;
